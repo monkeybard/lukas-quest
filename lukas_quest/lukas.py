@@ -3,6 +3,7 @@ import numpy
 import random
 from collections import Counter
 from lukas_quest.classes import *
+from lukas_quest.unit import Unit
 
 filepath = './lukas_quest/lukas.save'
 default_feclass = Soldier()
@@ -17,27 +18,18 @@ default_inventory = Counter()
 default_steps = 0
 
 
-class Lukas(object):
+class Lukas(Unit):
     """
     Stores information on Lukas himself.
     """
-
-    @staticmethod
-    def stat_name_to_index(name):
-        return {'HP': 0, 'ATK': 1, 'SKL': 2, 'SPD': 3, 'LCK': 4, 'DEF': 5, 'RES': 6}[name.upper()]
 
     def __init__(self, other=None):
         try:
             self.load(other)
         except OSError:
             print("No file found, resetting...")
-            self.feclass = default_feclass
-            self.level = default_level
+            Unit.__init__(self, default_feclass, default_level, default_stats, default_stat_caps, default_growth_rates)
             self.exp = default_exp
-            self.stats = default_stats
-            self.current_hp = self.stats[(Lukas.stat_name_to_index('HP'))]
-            self.stat_caps = default_stat_caps
-            self.growth_rates = default_growth_rates
             self.stamina = default_stamina
             self.happiness = default_happiness
             self.inventory = default_inventory
@@ -50,7 +42,7 @@ class Lukas(object):
         self.exp = other.exp if 'exp' in check else default_exp
         self.stats = other.stats if 'stats' in check else default_stats
         self.current_hp = other.current_hp if 'current_hp' in check else\
-                                                                        self.stats[(Lukas.stat_name_to_index('HP'))]
+                                                                        self.stats[(Unit.stat_name_to_index('HP'))]
         self.stat_caps = other.stat_caps if 'stat_caps' in check else default_stat_caps
         self.growth_rates = other.growth_rates if 'growth_rates' in check else default_growth_rates
         self.stamina = other.stamina if 'stamina' in check else default_stamina
@@ -77,7 +69,7 @@ class Lukas(object):
         self.level = default_level
         self.exp = default_exp
         self.stats = default_stats
-        self.current_hp = self.stats[(Lukas.stat_name_to_index('HP'))]
+        self.current_hp = self.stats[(Unit.stat_name_to_index('HP'))]
         self.stat_caps = default_stat_caps
         self.growth_rates = default_growth_rates
         self.stamina = default_stamina
@@ -106,31 +98,6 @@ class Lukas(object):
     def adjust_happiness(self, happiness):
         """Change happiness by value specified."""
         self.happiness = min(max(0, self.happiness + int(happiness)), 500)
-
-    def adjust_hp(self, hp):
-        """Change HP by value specified. Returns True if Lukas died and reset."""
-        self.current_hp = min(self.current_hp + int(hp), self.stats[Lukas.stat_name_to_index('HP')])
-        if self.current_hp <= 0:
-            self.reset()
-            return True
-        return False
-
-    def levelup(self):
-        if self.level != 20:
-            current_growths = self.growth_rates + self.feclass.base_growths
-            increased = np.array([0]*7)
-            for i in range(len(self.stats)):
-                # %growths > 100 are guaranteed stat increases + (growth % 100)% chance of increasing further
-                increased[i] += self.increase_stat(i, increase_by=current_growths[i]//100)
-                if random.randrange(100)+1 <= (current_growths[i] % 100):
-                    increased[i] += self.increase_stat(i)
-            self.level += 1
-            return increased
-
-    def increase_stat(self, stat_index, increase_by=1):
-        old_stat = self.stats[stat_index]
-        self.stats[stat_index] = min(self.stats[stat_index] + increase_by, self.stat_caps[stat_index])
-        return self.stats[stat_index] - old_stat
 
     def class_change(self, new_class):
         self.feclass = new_class

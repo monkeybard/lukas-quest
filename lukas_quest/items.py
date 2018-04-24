@@ -1,4 +1,4 @@
-from lukas_quest.lukas import Lukas
+from lukas_quest.lukas import Unit
 
 
 class Preference:
@@ -98,49 +98,49 @@ def bread(lukas, log):
 
 @Flavours.sweet(0, 40)
 def fruit_of_life(lukas, log):
-    increase = lukas.increase_stat(Lukas.stat_name_to_index('HP'), 2)
+    increase = lukas.increase_stat(Unit.stat_name_to_index('HP'), 2)
     if increase:
         log.appendleft("Lukas' HP increased by {}.".format(increase))
 
 
 @Flavours.sweet(0, 40)
 def soma(lukas, log):
-    increase = lukas.increase_stat(Lukas.stat_name_to_index('ATK'), 2)
+    increase = lukas.increase_stat(Unit.stat_name_to_index('ATK'), 2)
     if increase:
         log.appendleft("Lukas' ATK increased by {}.".format(increase))
 
 
 @Flavours.refined(0, 40)
 def nethergranate(lukas, log):
-    increase = lukas.increase_stat(Lukas.stat_name_to_index('SKL'), 2)
+    increase = lukas.increase_stat(Unit.stat_name_to_index('SKL'), 2)
     if increase:
         log.appendleft("Lukas' SKL increased by {}.".format(increase))
 
 
 @Flavours.rich(0, 40)
 def pegasus_cheese(lukas, log):
-    increase = lukas.increase_stat(Lukas.stat_name_to_index('SPD'), 2)
+    increase = lukas.increase_stat(Unit.stat_name_to_index('SPD'), 2)
     if increase:
         log.appendleft("Lukas' SPD increased by {}.".format(increase))
 
 
 @Flavours.sweet(0, 40)
 def nectar(lukas, log):
-    increase = lukas.increase_stat(Lukas.stat_name_to_index('LCK'), 2)
+    increase = lukas.increase_stat(Unit.stat_name_to_index('LCK'), 2)
     if increase:
         log.appendleft("Lukas' LCK increased by {}.".format(increase))
 
 
 @Flavours.sweet(0, 40)
 def ambrosia(lukas, log):
-    increase = lukas.increase_stat(Lukas.stat_name_to_index('DEF'), 2)
+    increase = lukas.increase_stat(Unit.stat_name_to_index('DEF'), 2)
     if increase:
         log.appendleft("Lukas' DEF increased by {}.".format(increase))
 
 
 @Flavours.sweet(0, 40)
 def golden_apple(lukas, log):
-    increase = lukas.increase_stat(Lukas.stat_name_to_index('RES'), 2)
+    increase = lukas.increase_stat(Unit.stat_name_to_index('RES'), 2)
     if increase:
         log.appendleft("Lukas' RES increased by {}.".format(increase))
 

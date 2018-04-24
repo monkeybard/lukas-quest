@@ -1,7 +1,8 @@
 import numpy
 from collections import deque
 from lukas_quest import items
-from lukas_quest.lukas import *
+from lukas_quest.lukas import Lukas
+from lukas_quest.unit import Unit
 
 
 class Quest(object):
@@ -9,26 +10,23 @@ class Quest(object):
     Provides functionality to interact with Lukas.
     """
 
-    class Enemy(object):
+    class Enemy(Unit):
         """
         Simple container for an enemy.
         """
-        def __init__(self, name, stats):
+        def __init__(self, name, feclass, level, base_stats, stat_caps):
             self.name = name
-            self.stats = np.array(stats)
-            self.current_hp = self.stats[Lukas.stat_name_to_index('HP')]
+            Unit.__init__(self, feclass, level, base_stats, stat_caps)
+            self.autolevel()
 
-        def adjust_hp(self, hp):
-            """Change HP by value specified. Returns True if enemy died."""
-            self.current_hp += hp
-            if self.current_hp <= 0:
-                return True
-            return False
+        def autolevel(self):
+            for i in range(self.level-1):
+                self.levelup()
 
     def __init__(self):
         self._lukas = Lukas()
         self._in_battle = False
-        self._enemy = np.array(None)
+        self._enemy = numpy.array([])
         self.quest_log = deque()
 
     def battle_status(in_battle):
@@ -58,8 +56,6 @@ class Quest(object):
                 food_dist = [0.7/18]*16 + [0.25/10]*10 + [0.7/18]*2 + [0.05/7]*7
                 random_food = numpy.random.choice(items.foods, size=1, p=food_dist)[0]
                 self.give(random_food)
-                self.quest_log.appendleft("Found a{} {}.".format(
-                    'n' if random_food[0] in ['a', 'e', 'i', 'o', 'u'] else '', random_food.replace('_', ' ').title()))
 
             def get_exp():
                 exp = numpy.random.choice([10, 15, 25, 50, 100], size=1, p=[0.5, 0.25, 0.125, 0.1, 0.025])[0]
@@ -69,11 +65,10 @@ class Quest(object):
                 self.quest_log.appendleft("An enemy approaches.")
 
             if self._lukas.steps % 20 == 0 or self._lukas.steps % 30 == 0:
-                numpy.random.choice([find_item, get_exp, trigger_battle], size=1, p=[0.6, 0.1, 0.3])[0]()
+                numpy.random.choice([find_item, get_exp, trigger_battle], size=1, p=[0.0, 1.0, 0.0])[0]()
 
             if self._lukas.stamina == 0:
                 self.quest_log.appendleft("Lukas: I'm afraid... I can walk no further...")
-
 
     def get_inventory(self):
         return self._lukas.inventory
@@ -92,6 +87,8 @@ class Quest(object):
     def give(self, item_name):
         """Adds an item to the inventory."""
         self._lukas.inventory[item_name] += 1
+        self.quest_log.appendleft("Obtained a{} {}.".format(
+            'n' if item_name[0] in ['a', 'e', 'i', 'o', 'u'] else '', item_name.replace('_', ' ').title()))
 
     @battle_status(False)
     def use(self, item_name):
