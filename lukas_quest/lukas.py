@@ -124,7 +124,9 @@ class Lukas(object):
             self.level += 1
 
     def increase_stat(self, stat_index, increase_by=1):
+        old_stat = self.stats[stat_index]
         self.stats[stat_index] = min(self.stats[stat_index] + increase_by, self.stat_caps[stat_index])
+        return self.stats[stat_index] - old_stat
 
     def class_change(self, new_class):
         self.feclass = new_class

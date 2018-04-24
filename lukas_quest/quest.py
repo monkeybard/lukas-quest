@@ -10,7 +10,7 @@ class Quest(object):
 
     def __init__(self):
         self._lukas = Lukas()
-        self.quest_log = deque
+        self.quest_log = deque()
 
     @property
     def status(self):
@@ -32,7 +32,7 @@ class Quest(object):
     def use(self, item_name):
         if self._lukas.inventory[item_name]:
             item = getattr(items, item_name)
-            effect_string = item(self._lukas)
+            effect_string = item(self._lukas, self.quest_log)
             self._lukas.inventory[item_name] -= 1
             return effect_string
 
