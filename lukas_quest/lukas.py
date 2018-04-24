@@ -10,7 +10,7 @@ default_level = 2
 default_exp = 0
 default_stats = numpy.array([22, 10, 4, 4, 2, 5, 2])
 default_stat_caps = numpy.array([52, 40, 40, 38, 40, 42, 40])
-default_growth_rates = numpy.array([50, 30, 40, 25, 30, 45])
+default_growth_rates = numpy.array([50, 30, 40, 25, 30, 45, 20])
 default_stamina = 500
 default_happiness = 0
 default_inventory = Counter()
@@ -100,15 +100,15 @@ class Lukas(object):
 
     def adjust_stamina(self, stamina):
         """Change stamina by value specified."""
-        self.stamina = min(max(0, self.stamina + stamina), 500)
+        self.stamina = min(max(0, self.stamina + int(stamina)), 500)
 
     def adjust_happiness(self, happiness):
         """Change happiness by value specified."""
-        self.happiness = min(max(0, self.happiness + happiness), 500)
+        self.happiness = min(max(0, self.happiness + int(happiness)), 500)
 
     def adjust_hp(self, hp):
         """Change HP by value specified. Returns True if Lukas died and reset."""
-        self.current_hp = min(self.current_hp + hp, self.stats[Lukas.stat_name_to_index('HP')])
+        self.current_hp = min(self.current_hp + int(hp), self.stats[Lukas.stat_name_to_index('HP')])
         if self.current_hp <= 0:
             self.reset()
             return True
@@ -118,8 +118,10 @@ class Lukas(object):
         if self.level != 20:
             current_growths = self.growth_rates + self.feclass.base_growths
             for i in range(len(self.stats)):
-                if random.randrange(100)+1 <= current_growths[i]:
+                self.increase_stat(i, increase_by=current_growths[i]//100)
+                if random.randrange(100)+1 <= (current_growths[i] % 100):
                     self.increase_stat(i)
+            self.level += 1
 
     def increase_stat(self, stat_index, increase_by=1):
         self.stats[stat_index] = min(self.stats[stat_index] + increase_by, self.stat_caps[stat_index])
