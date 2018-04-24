@@ -5,6 +5,7 @@ from lukas_quest.lukas import Unit
 def clean_name(item_name):
     return item_name.replace('_', ' ').title()
 
+
 class Preference:
     """Basic decorators that define how preferences affect recovery."""
 
@@ -25,10 +26,10 @@ class Preference:
             return wrapped_f
         return wrap
 
-    dislike = staticmethod(partial(preference.__get__(object), 0.5, -20, "Lukas: I find this hard to palate..."))
-    neutral = staticmethod(partial(preference.__get__(object), 1, 0, "Lukas: That was refreshing."))
-    like = staticmethod(partial(preference.__get__(object), 1.5, 20, "Lukas: Mmm, a fine meal."))
-    love = staticmethod(partial(preference.__get__(object), 3, 50, "Lukas: O-oh, now this is a treat!"))
+    dislike = partial(preference.__get__(object), 0.5, -20, "Lukas: I find this hard to palate...")
+    neutral = partial(preference.__get__(object), 1, 0, "Lukas: That was refreshing.")
+    like = partial(preference.__get__(object), 1.5, 20, "Lukas: Mmm, a fine meal.")
+    love = partial(preference.__get__(object), 3, 50, "Lukas: O-oh, now this is a treat!")
 
 
 class Flavours:
