@@ -18,24 +18,23 @@ class Unit(object):
         self.growth_rates = numpy.array(growth_rates)
 
     def adjust_hp(self, hp):
-        """Change HP by value specified. Returns True if Lukas died and reset."""
+        """Change HP by value specified. Returns True if hp has hit 0 and reset."""
         self.current_hp = min(self.current_hp + int(hp), self.stats[Unit.stat_name_to_index('HP')])
         if self.current_hp <= 0:
-            self.reset()
             return True
         return False
 
     def levelup(self):
+        increased = np.array([0] * 7)
         if self.level != 20:
             current_growths = self.growth_rates + self.feclass.base_growths
-            increased = np.array([0]*7)
             for i in range(len(self.stats)):
                 # %growths > 100 are guaranteed stat increases + (growth % 100)% chance of increasing further
                 increased[i] += self.increase_stat(i, increase_by=current_growths[i]//100)
                 if random.randrange(100)+1 <= (current_growths[i] % 100):
                     increased[i] += self.increase_stat(i)
             self.level += 1
-            return increased
+        return increased
 
     def increase_stat(self, stat_index, increase_by=1):
         old_stat = self.stats[stat_index]

@@ -140,9 +140,10 @@ def ambrosia(lukas, log):
 
 @Flavours.sweet(0, 40)
 def golden_apple(lukas, log):
-    increase = lukas.increase_stat(Unit.stat_name_to_index('RES'), 2)
-    if increase:
-        log.appendleft("Lukas' RES increased by {}.".format(increase))
+    increased = lukas.levelup()
+    if any(increased):
+        log.appendleft("Levelled up!")
+        log.appendleft(lukas.stats)
 
 
 foods = [food for food in globals()
