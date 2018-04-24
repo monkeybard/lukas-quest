@@ -1,6 +1,7 @@
 from lukas_quest.quest import *
 
 quest = Quest()
+
 while True:
     if quest.in_battle:
         e_status = quest.enemy_status()

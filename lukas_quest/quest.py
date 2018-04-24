@@ -70,7 +70,7 @@ class Quest(object):
                 self.process_exp(exp)
 
             def trigger_battle():
-                max_level = self._lukas.steps//10
+                max_level = self._lukas.steps//100
                 self._enemy = Quest.Enemy(level=max(1, random.randrange(max_level-3, max_level)))
                 self.quest_log.appendleft("{} appeared!".format(self._enemy.name))
                 self.in_battle = True

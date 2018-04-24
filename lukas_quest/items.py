@@ -1,5 +1,9 @@
+from functools import partial
 from lukas_quest.lukas import Unit
 
+
+def clean_name(item_name):
+    return item_name.replace('_', ' ').title()
 
 class Preference:
     """Basic decorators that define how preferences affect recovery."""
@@ -11,44 +15,20 @@ class Preference:
         lukas.adjust_happiness(happiness_change)
 
     @staticmethod
-    def dislike(hp_recover, stamina_recover):
+    def preference(stamina_mult, happiness, reaction, hp_recover, stamina_recover):
         def wrap(fun):
             def wrapped_f(lukas, log):
-                Preference.modify(lukas, hp_recover, stamina_recover // 2, -20)
-                log.appendleft("Lukas: I find this hard to palate...")
+                Preference.modify(lukas, hp_recover, int(stamina_recover * stamina_mult), happiness)
+                log.appendleft(reaction)
                 fun(lukas, log)
+            setattr(wrapped_f, 'isfood', None)
             return wrapped_f
         return wrap
 
-    @staticmethod
-    def neutral(hp_recover, stamina_recover):
-        def wrap(fun):
-            def wrapped_f(lukas, log):
-                Preference.modify(lukas, hp_recover, stamina_recover, 0)
-                log.appendleft("Lukas: That was refreshing.")
-                fun(lukas, log)
-            return wrapped_f
-        return wrap
-
-    @staticmethod
-    def like(hp_recover, stamina_recover):
-        def wrap(fun):
-            def wrapped_f(lukas, log):
-                Preference.modify(lukas, hp_recover, (stamina_recover * 3) // 2, 20)
-                log.appendleft("Lukas: Mmm, a fine meal.")
-                fun(lukas, log)
-            return wrapped_f
-        return wrap
-
-    @staticmethod
-    def love(hp_recover, stamina_recover):
-        def wrap(fun):
-            def wrapped_f(lukas, log):
-                Preference.modify(lukas, hp_recover, stamina_recover * 3, 50)
-                log.appendleft("Lukas: O-oh, now this is a treat!")
-                fun(lukas, log)
-            return wrapped_f
-        return wrap
+    dislike = staticmethod(partial(preference.__get__(object), 0.5, -20, "Lukas: I find this hard to palate..."))
+    neutral = staticmethod(partial(preference.__get__(object), 1, 0, "Lukas: That was refreshing."))
+    like = staticmethod(partial(preference.__get__(object), 1.5, 20, "Lukas: Mmm, a fine meal."))
+    love = staticmethod(partial(preference.__get__(object), 3, 50, "Lukas: O-oh, now this is a treat!"))
 
 
 class Flavours:
@@ -146,9 +126,4 @@ def golden_apple(lukas, log):
         log.appendleft(lukas.stats)
 
 
-foods = [food for food in globals()
-         if callable(globals()[food]) and not food.startswith('_') and not food[0].isupper()]
-
-
-def clean_name(item_name):
-    return item_name.replace('_', ' ').title()
+foods = [food for food in globals() if hasattr(globals()[food], 'isfood')]
