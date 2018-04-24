@@ -1,6 +1,5 @@
 import pickle
 import numpy
-import random
 from collections import Counter
 from lukas_quest.classes import *
 from lukas_quest.unit import Unit
@@ -16,6 +15,7 @@ default_stamina = 500
 default_happiness = 0
 default_inventory = Counter()
 default_steps = 0
+loading_debug = True
 
 
 class Lukas(Unit):
@@ -27,13 +27,16 @@ class Lukas(Unit):
         try:
             self.load(other)
         except OSError:
-            print("No file found, resetting...")
+            global loading_debug
+            if loading_debug:
+                print("No file found, resetting...")
             Unit.__init__(self, default_feclass, default_level, default_stats, default_stat_caps, default_growth_rates)
             self.exp = default_exp
             self.stamina = default_stamina
             self.happiness = default_happiness
             self.inventory = default_inventory
             self.steps = default_steps
+        loading_debug = False
 
     def copy(self, other):
         check = dir(other)
@@ -51,13 +54,16 @@ class Lukas(Unit):
         self.steps = other.steps if 'steps' in check else default_steps
 
     def load(self, other=None):
+        global loading_debug
         if other is None:
-            print("Loading from file...")
+            if loading_debug:
+                print("Loading from file...")
             with open(filepath, 'rb') as to_load:
                 loaded = pickle.load(to_load)
                 self.copy(loaded)
         else:
-            print("Copying existing Lukas...")
+            if loading_debug:
+                print("Copying existing Lukas...")
             self.copy(other)
 
     def save(self):

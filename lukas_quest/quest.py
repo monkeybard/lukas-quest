@@ -14,9 +14,9 @@ class Quest(object):
         """
         Simple container for an enemy.
         """
-        def __init__(self, name, feclass, level, base_stats, stat_caps):
+        def __init__(self, name, feclass, level, base_stats=[0, 0, 0, 0, 0, 0, 0]):
             self.name = name
-            Unit.__init__(self, feclass, level, base_stats, stat_caps)
+            Unit.__init__(self, feclass, level, base_stats, [52, 40, 40, 40, 40, 40, 40])
             self.autolevel()
 
         def autolevel(self):
@@ -32,7 +32,11 @@ class Quest(object):
     def battle_status(in_battle):
         def wrap(fun):
             def wrap_f(self, *args, **kwargs):
-                return fun(self, *args, **kwargs) if self._in_battle == in_battle else None
+                if self._in_battle == in_battle:
+                    return fun(self, *args, **kwargs)
+                else:
+                    self.quest_log.appendleft("You cannot do that out of battle." if in_battle
+                                              else "You cannot do that in battle.")
             return wrap_f
         return wrap
 
@@ -65,7 +69,7 @@ class Quest(object):
                 self.quest_log.appendleft("An enemy approaches.")
 
             if self._lukas.steps % 20 == 0 or self._lukas.steps % 30 == 0:
-                numpy.random.choice([find_item, get_exp, trigger_battle], size=1, p=[0.0, 1.0, 0.0])[0]()
+                numpy.random.choice([find_item, get_exp, trigger_battle], size=1, p=[0.6, 0.1, 0.3])[0]()
 
             if self._lukas.stamina == 0:
                 self.quest_log.appendleft("Lukas: I'm afraid... I can walk no further...")
@@ -88,15 +92,19 @@ class Quest(object):
         """Adds an item to the inventory."""
         self._lukas.inventory[item_name] += 1
         self.quest_log.appendleft("Obtained a{} {}.".format(
-            'n' if item_name[0] in ['a', 'e', 'i', 'o', 'u'] else '', item_name.replace('_', ' ').title()))
+            'n' if item_name[0] in ['a', 'e', 'i', 'o', 'u'] else '', items.clean_name(item_name)))
 
     @battle_status(False)
     def use(self, item_name):
         """Use an item in the inventory."""
         if self._lukas.inventory[item_name]:
             item = getattr(items, item_name)
+            self.quest_log.appendleft("Used a{} {}.".format(
+                'n' if item_name[0] in ['a', 'e', 'i', 'o', 'u'] else '', items.clean_name(item_name)))
             item(self._lukas, self.quest_log)
             self._lukas.inventory[item_name] -= 1
+        else:
+            self.quest_log.appendleft("You do not have {}.".format(items.clean_name(item_name)))
 
     @battle_status(False)
     def get_promotion_list(self):

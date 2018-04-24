@@ -26,3 +26,9 @@ class Soldier (FEClass):
 
     def __init__(self):
         FEClass.__init__(self, 'Soldier', {Knight()}, [26, 10, 1, 3, 0, 5, 0], [5, 5, 0, -10, -5, 5, 0])
+
+
+class Brigand (FEClass):
+
+    def __init__(self):
+        FEClass.__init__(self, 'Brigand', set(), [26, 7, 1, 2, 0, 2, 0], [120, 45, 40, 45, 0, 40, 10])

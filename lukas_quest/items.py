@@ -147,3 +147,7 @@ def golden_apple(lukas, log):
 
 foods = [food for food in globals()
          if callable(globals()[food]) and not food.startswith('_') and not food[0].isupper()]
+
+
+def clean_name(item_name):
+    return item_name.replace('_', ' ').title()
