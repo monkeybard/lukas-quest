@@ -86,17 +86,18 @@ class Lukas(object):
         self.steps = default_steps
 
     def give_exp(self, exp):
-        """Awards exp. Returns true if level up occurred."""
+        """Awards exp. Returns a table of stat increases if level up occurred."""
         if self.level < 20:
             self.exp += exp
             while self.exp >= 100:
-                self.levelup()
+                increased = self.levelup()
                 if self.level == 20:
                     self.exp = 0
                 else:
                     self.exp -= 100
-                return True
-        return False
+                return increased
+            return np.array([0]*7)
+        return None
 
     def adjust_stamina(self, stamina):
         """Change stamina by value specified."""
@@ -117,11 +118,14 @@ class Lukas(object):
     def levelup(self):
         if self.level != 20:
             current_growths = self.growth_rates + self.feclass.base_growths
+            increased = np.array([0]*7)
             for i in range(len(self.stats)):
-                self.increase_stat(i, increase_by=current_growths[i]//100)
+                # %growths > 100 are guaranteed stat increases + (growth % 100)% chance of increasing further
+                increased[i] += self.increase_stat(i, increase_by=current_growths[i]//100)
                 if random.randrange(100)+1 <= (current_growths[i] % 100):
-                    self.increase_stat(i)
+                    increased[i] += self.increase_stat(i)
             self.level += 1
+            return increased
 
     def increase_stat(self, stat_index, increase_by=1):
         old_stat = self.stats[stat_index]
