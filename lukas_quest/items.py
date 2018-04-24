@@ -1,5 +1,4 @@
-from functools import wraps
-
+from lukas_quest.lukas import Lukas
 
 class Preference:
     """Basic decorators that define how preferences affect recovery."""
@@ -13,7 +12,6 @@ class Preference:
     @staticmethod
     def dislike(hp_recover, stamina_recover):
         def wrap(fun):
-            @wraps(fun)
             def wrapped_f(lukas):
                 Preference.modify(lukas, hp_recover, stamina_recover // 2, -20)
                 fun(lukas)
@@ -24,7 +22,6 @@ class Preference:
     @staticmethod
     def neutral(hp_recover, stamina_recover):
         def wrap(fun):
-            @wraps(fun)
             def wrapped_f(lukas):
                 Preference.modify(lukas, hp_recover, stamina_recover, 0)
                 fun(lukas)
@@ -35,7 +32,6 @@ class Preference:
     @staticmethod
     def like(hp_recover, stamina_recover):
         def wrap(fun):
-            @wraps(fun)
             def wrapped_f(lukas):
                 Preference.modify(lukas, hp_recover, (stamina_recover * 3) // 2, 20)
                 fun(lukas)
@@ -46,7 +42,6 @@ class Preference:
     @staticmethod
     def love(hp_recover, stamina_recover):
         def wrap(fun):
-            @wraps(fun)
             def wrapped_f(lukas):
                 Preference.modify(lukas, hp_recover, stamina_recover * 3, 50)
                 fun(lukas)
@@ -74,6 +69,18 @@ holey_cheese = Flavours.rich(10, 10)(pass_fun)
 soup = Flavours.plain(10, 20)(pass_fun)
 garlic = Flavours.refined(10, 30)(pass_fun)
 mana_herbs = Flavours.rough(20, 10)(pass_fun)
+butter = yogurt = Flavours.rich(20, 10)(pass_fun)
+herring = Flavours.plain(20, 10)(pass_fun)
+dried_meat = Flavours.meaty(20, 10)(pass_fun)
+raw_meat = Flavours.meaty(20, 20)(pass_fun)
+honey = Flavours.sweet(30, 20)(pass_fun)
+sausage = ham = Flavours.meaty(30, 20)(pass_fun)
+dried_shieldfish = Flavours.refined(30, 20)(pass_fun)
+sweet_cookie = Flavours.sweet(30, 20)(pass_fun)
+blue_cheese = dagon_filet = Flavours.refined(40, 20)(pass_fun)
+medicinal_syrup = Flavours.bitter(40, 40)(pass_fun)
+exotic_spice = Flavours.refined(10, 50)(pass_fun)
+duma_moss = Flavours.yucky(30, 0)(pass_fun)
 
 
 @Flavours.plain(10, 10)
@@ -84,3 +91,38 @@ def leftover_bread(lukas):
 @Flavours.plain(10, 10)
 def bread(lukas):
     lukas.inventory['leftover_bread'] += 1
+
+
+@Flavours.sweet(0, 40)
+def fruit_of_life(lukas):
+    lukas.increase_stat(Lukas.stat_name_to_index('HP'), 2)
+
+
+@Flavours.sweet(0, 40)
+def soma(lukas):
+    lukas.increase_stat(Lukas.stat_name_to_index('ATK'), 2)
+
+
+@Flavours.refined(0, 40)
+def nethergranate(lukas):
+    lukas.increase_stat(Lukas.stat_name_to_index('SKL'), 2)
+
+
+@Flavours.rich(0, 40)
+def pegasus_cheese(lukas):
+    lukas.increase_stat(Lukas.stat_name_to_index('SPD'), 2)
+
+
+@Flavours.sweet(0, 40)
+def nectar(lukas):
+    lukas.increase_stat(Lukas.stat_name_to_index('LCK'), 2)
+
+
+@Flavours.sweet(0, 40)
+def ambrosia(lukas):
+    lukas.increase_stat(Lukas.stat_name_to_index('DEF'), 2)
+
+
+@Flavours.sweet(0, 40)
+def golden_apple(lukas):
+    lukas.increase_stat(Lukas.stat_name_to_index('RES'), 2)
