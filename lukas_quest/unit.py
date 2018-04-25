@@ -84,7 +84,7 @@ class Player(Unit):
     Stores information on Lukas himself.
     """
 
-    def __init__(self, other=None):
+    def __init__(self):
         Unit.__init__(self, player_name,
                       default_feclass, default_level, default_stats, default_stat_caps, default_growth_rates)
         self.exp = default_exp
@@ -134,3 +134,9 @@ class Player(Unit):
         self.level = 1
         self.exp = 0
         self.stats = numpy.maximum(self.stats, self.feclass.base_stats)
+
+    @property
+    def combat_stats(self):
+        p_atk, p_def, p_atkspd, p_hit, p_avoid, p_crit, p_critavoid = Unit.combat_stats.fget(self)
+        happiness_factor = self.happiness//50
+        return p_atk, p_def, p_atkspd, p_hit, p_avoid + happiness_factor, p_crit + happiness_factor, p_critavoid
