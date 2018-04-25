@@ -2,10 +2,10 @@ from lukas_quest.quest import *
 
 quest = Quest()
 
-while True:
+for i in range(200):
     if quest.in_battle:
         e_status = quest.enemy_status()
-        print('\t', e_status.level, e_status.current_hp, e_status.stats)
+        print('\t', e_status.level, e_status.current_hp, e_status.combat_stats)
         quest.resolve_phase()
     else:
         quest.step()
@@ -24,3 +24,6 @@ while True:
         while quest.quest_log:
             print('\t', quest.quest_log.pop())
 
+print('Current Level: ', status.level, ', Current Happiness: ', status.happiness,
+      ', Current Stats: ', status.stats, sep='')
+quest.save()

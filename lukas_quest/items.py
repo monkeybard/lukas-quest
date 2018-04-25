@@ -1,5 +1,6 @@
 from functools import partial
-from lukas_quest.lukas import Unit
+from lukas_quest.config import *
+from lukas_quest.unit import stat_name_to_index
 
 
 def clean_name(item_name):
@@ -10,26 +11,26 @@ class Preference:
     """Basic decorators that define how preferences affect recovery."""
 
     @staticmethod
-    def modify(lukas, hp_recover, stamina_recover, happiness_change):
-        lukas.adjust_hp(hp_recover)
-        lukas.adjust_stamina(stamina_recover)
-        lukas.adjust_happiness(happiness_change)
+    def modify(player, hp_recover, stamina_recover, happiness_change):
+        player.adjust_hp(hp_recover)
+        player.adjust_stamina(stamina_recover)
+        player.adjust_happiness(happiness_change)
 
     @staticmethod
     def preference(stamina_mult, happiness, reaction, hp_recover, stamina_recover):
         def wrap(fun):
-            def wrapped_f(lukas, log):
-                Preference.modify(lukas, hp_recover, int(stamina_recover * stamina_mult), happiness)
+            def wrapped_f(player, log):
+                Preference.modify(player, hp_recover, int(stamina_recover * stamina_mult), happiness)
                 log.appendleft(reaction)
-                fun(lukas, log)
+                fun(player, log)
             setattr(wrapped_f, 'isfood', None)
             return wrapped_f
         return wrap
 
-    dislike = partial(preference.__get__(object), 0.5, -20, "Lukas: I find this hard to palate...")
-    neutral = partial(preference.__get__(object), 1, 0, "Lukas: That was refreshing.")
-    like = partial(preference.__get__(object), 1.5, 20, "Lukas: Mmm, a fine meal.")
-    love = partial(preference.__get__(object), 3, 50, "Lukas: O-oh, now this is a treat!")
+    dislike = partial(preference.__get__(object), 0.5, -20, dislike_line)
+    neutral = partial(preference.__get__(object), 1, 0, neutral_line)
+    like = partial(preference.__get__(object), 1.5, 20, like_line)
+    love = partial(preference.__get__(object), 3, 50, love_line)
 
 
 class Flavours:
@@ -40,7 +41,7 @@ class Flavours:
     sweet = tasty = Preference.love
 
 
-def _pass_fun(lukas, log):
+def _pass_fun(player, log):
     pass
 
 
@@ -66,65 +67,65 @@ duma_moss = Flavours.yucky(30, 0)(_pass_fun)
 
 
 @Flavours.plain(10, 10)
-def leftover_bread(lukas, log):
-    lukas.inventory['bread_piece'] += 1
+def leftover_bread(player, log):
+    player.inventory['bread_piece'] += 1
     log.appendleft("Bread Piece added to inventory.")
 
 
 @Flavours.plain(10, 10)
-def bread(lukas, log):
-    lukas.inventory['leftover_bread'] += 1
+def bread(player, log):
+    player.inventory['leftover_bread'] += 1
     log.appendleft("Leftover Bread added to inventory.")
 
 
 @Flavours.sweet(0, 40)
-def fruit_of_life(lukas, log):
-    increase = lukas.increase_stat(Unit.stat_name_to_index('HP'), 2)
+def fruit_of_life(player, log):
+    increase = player.increase_stat(stat_name_to_index('HP'), 2)
     if increase:
-        log.appendleft("Lukas' HP increased by {}.".format(increase))
+        log.appendleft("HP increased by {}.".format(increase))
 
 
 @Flavours.sweet(0, 40)
-def soma(lukas, log):
-    increase = lukas.increase_stat(Unit.stat_name_to_index('ATK'), 2)
+def soma(player, log):
+    increase = player.increase_stat(stat_name_to_index('ATK'), 2)
     if increase:
-        log.appendleft("Lukas' ATK increased by {}.".format(increase))
+        log.appendleft("ATK increased by {}.".format(increase))
 
 
 @Flavours.refined(0, 40)
-def nethergranate(lukas, log):
-    increase = lukas.increase_stat(Unit.stat_name_to_index('SKL'), 2)
+def nethergranate(player, log):
+    increase = player.increase_stat(stat_name_to_index('SKL'), 2)
     if increase:
-        log.appendleft("Lukas' SKL increased by {}.".format(increase))
+        log.appendleft("SKL increased by {}.".format(increase))
 
 
 @Flavours.rich(0, 40)
-def pegasus_cheese(lukas, log):
-    increase = lukas.increase_stat(Unit.stat_name_to_index('SPD'), 2)
+def pegasus_cheese(player, log):
+    increase = player.increase_stat(stat_name_to_index('SPD'), 2)
     if increase:
-        log.appendleft("Lukas' SPD increased by {}.".format(increase))
+        log.appendleft("SPD increased by {}.".format(increase))
 
 
 @Flavours.sweet(0, 40)
-def nectar(lukas, log):
-    increase = lukas.increase_stat(Unit.stat_name_to_index('LCK'), 2)
+def nectar(player, log):
+    increase = player.increase_stat(stat_name_to_index('LCK'), 2)
     if increase:
-        log.appendleft("Lukas' LCK increased by {}.".format(increase))
+        log.appendleft("LCK increased by {}.".format(increase))
 
 
 @Flavours.sweet(0, 40)
-def ambrosia(lukas, log):
-    increase = lukas.increase_stat(Unit.stat_name_to_index('DEF'), 2)
+def ambrosia(player, log):
+    increase = player.increase_stat(stat_name_to_index('DEF'), 2)
     if increase:
-        log.appendleft("Lukas' DEF increased by {}.".format(increase))
+        log.appendleft("DEF increased by {}.".format(increase))
 
 
 @Flavours.sweet(0, 40)
-def golden_apple(lukas, log):
-    increased = lukas.levelup()
+def golden_apple(player, log):
+    increased = player.levelup()
     if any(increased):
         log.appendleft("Levelled up!")
-        log.appendleft(lukas.stats)
+        log.appendleft(player.stats)
 
 
 foods = [food for food in globals() if hasattr(globals()[food], 'isfood')]
